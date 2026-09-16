@@ -28,13 +28,33 @@ function saveTasks() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state.tasks));
 }
 
+function sanitizeTask(task) {
+  if (!task || typeof task !== 'object') return null;
+  if (typeof task.id !== 'string' || typeof task.text !== 'string' || typeof task.completed !== 'boolean') {
+    return null;
+  }
+
+  const normalizedText = task.text.trim();
+  if (!normalizedText) return null;
+
+  const createdAt = typeof task.createdAt === 'string' ? task.createdAt : new Date().toISOString();
+
+  return {
+    id: task.id,
+    text: normalizedText,
+    completed: task.completed,
+    createdAt,
+  };
+}
+
 function loadTasks() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return [];
 
   try {
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map(sanitizeTask).filter(Boolean);
   } catch {
     return [];
   }
@@ -82,7 +102,7 @@ function renderTasks() {
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.checked = task.completed;
-    checkbox.setAttribute('aria-label', `Mark ${task.text} as ${task.completed ? 'active' : 'completed'}`);
+    checkbox.setAttribute('aria-label', `Task: ${task.text}`);
     checkbox.addEventListener('change', () => toggleTask(task.id));
 
     const textWrap = document.createElement('div');
