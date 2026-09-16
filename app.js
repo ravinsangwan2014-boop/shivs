@@ -25,7 +25,7 @@ function createTask(text) {
 }
 
 function showStorageError() {
-  showValidation('Tasks could not be saved because local storage is unavailable.');
+  showValidation('Tasks could not be synced because local storage is unavailable.');
 }
 
 function saveTasks() {
@@ -47,7 +47,7 @@ function sanitizeTask(task) {
   const normalizedText = task.text.trim();
   if (!normalizedText) return null;
 
-  const createdAt = typeof task.createdAt === 'string' ? task.createdAt : new Date().toISOString();
+  const createdAt = typeof task.createdAt === 'string' ? task.createdAt : '';
 
   return {
     id: task.id,
