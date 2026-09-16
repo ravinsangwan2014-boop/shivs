@@ -24,8 +24,18 @@ function createTask(text) {
   };
 }
 
+function showStorageError() {
+  showValidation('Tasks could not be saved because local storage is unavailable.');
+}
+
 function saveTasks() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.tasks));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.tasks));
+    return true;
+  } catch {
+    showStorageError();
+    return false;
+  }
 }
 
 function sanitizeTask(task) {
@@ -48,14 +58,14 @@ function sanitizeTask(task) {
 }
 
 function loadTasks() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return [];
-
   try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
     return parsed.map(sanitizeTask).filter(Boolean);
   } catch {
+    showStorageError();
     return [];
   }
 }
@@ -154,9 +164,9 @@ function addTask(event) {
   }
 
   state.tasks.unshift(createTask(text));
-  saveTasks();
+  const wasSaved = saveTasks();
   renderTasks();
-  clearValidation();
+  if (wasSaved) clearValidation();
   elements.form.reset();
   elements.input.focus();
 }
