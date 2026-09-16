@@ -154,6 +154,20 @@ function showValidation(message) {
   elements.validationMessage.textContent = message;
 }
 
+function commitTasks(nextTasks) {
+  const previousTasks = state.tasks;
+  state.tasks = nextTasks;
+
+  if (!saveTasks()) {
+    state.tasks = previousTasks;
+    renderTasks();
+    return false;
+  }
+
+  renderTasks();
+  return true;
+}
+
 function addTask(event) {
   event.preventDefault();
   const text = elements.input.value.trim();
@@ -163,26 +177,24 @@ function addTask(event) {
     return;
   }
 
-  state.tasks.unshift(createTask(text));
-  const wasSaved = saveTasks();
-  renderTasks();
-  if (wasSaved) clearValidation();
+  const wasSaved = commitTasks([createTask(text), ...state.tasks]);
+  if (!wasSaved) return;
+
+  clearValidation();
   elements.form.reset();
   elements.input.focus();
 }
 
 function toggleTask(id) {
-  state.tasks = state.tasks.map((task) =>
+  const nextTasks = state.tasks.map((task) =>
     task.id === id ? { ...task, completed: !task.completed } : task
   );
-  saveTasks();
-  renderTasks();
+  commitTasks(nextTasks);
 }
 
 function deleteTask(id) {
-  state.tasks = state.tasks.filter((task) => task.id !== id);
-  saveTasks();
-  renderTasks();
+  const nextTasks = state.tasks.filter((task) => task.id !== id);
+  commitTasks(nextTasks);
 }
 
 function setFilter(filter) {
@@ -193,9 +205,8 @@ function setFilter(filter) {
 function clearCompletedTasks() {
   const hasCompleted = state.tasks.some((task) => task.completed);
   if (!hasCompleted) return;
-  state.tasks = state.tasks.filter((task) => !task.completed);
-  saveTasks();
-  renderTasks();
+  const nextTasks = state.tasks.filter((task) => !task.completed);
+  commitTasks(nextTasks);
 }
 
 function bindEvents() {
