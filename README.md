@@ -32,7 +32,7 @@ On page load, the app reads saved tasks from `localStorage`, renders them, and w
 
 No build step or dependencies are required.
 
-1. Open `/home/runner/work/shivs/shivs/index.html` in any modern browser.
+1. Open `index.html` in any modern browser.
 2. Start using the app.
 
 ## Limitations

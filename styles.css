@@ -124,7 +124,7 @@ h1 {
   overflow-wrap: anywhere;
 }
 
-.task-text .completed {
+.completed {
   color: var(--muted);
   text-decoration: line-through;
 }
