@@ -112,7 +112,8 @@ function renderTasks() {
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.checked = task.completed;
-    checkbox.setAttribute('aria-label', `Task: ${task.text}`);
+    const taskLabel = task.text || 'Untitled task';
+    checkbox.setAttribute('aria-label', `Toggle completion for ${taskLabel}`);
     checkbox.addEventListener('change', () => toggleTask(task.id));
 
     const textWrap = document.createElement('div');
@@ -132,7 +133,7 @@ function renderTasks() {
     deleteButton.type = 'button';
     deleteButton.className = 'delete-btn';
     deleteButton.textContent = 'Delete';
-    deleteButton.setAttribute('aria-label', `Delete ${task.text}`);
+    deleteButton.setAttribute('aria-label', `Delete ${taskLabel}`);
     deleteButton.addEventListener('click', () => deleteTask(task.id));
 
     item.append(checkbox, textWrap, deleteButton);
