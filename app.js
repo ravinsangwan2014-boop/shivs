@@ -490,6 +490,15 @@
   global.TodoApp = api;
 
   if (global.document) {
-    createApp().init();
+    const bootstrap = () => createApp().init();
+
+    if (
+      global.document.readyState === 'loading' &&
+      typeof global.document.addEventListener === 'function'
+    ) {
+      global.document.addEventListener('DOMContentLoaded', bootstrap, { once: true });
+    } else {
+      bootstrap();
+    }
   }
 })(typeof globalThis !== 'undefined' ? globalThis : window);
