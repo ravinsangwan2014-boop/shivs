@@ -52,6 +52,11 @@ h1 {
   font-size: 1rem;
 }
 
+.task-form input[aria-invalid='true'] {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
 .task-form button,
 .filters button,
 .clear-btn,
@@ -66,6 +71,13 @@ h1 {
   padding: 0.75rem 1rem;
   background: var(--accent);
   color: #fff;
+}
+
+button:focus-visible,
+input:focus-visible,
+label:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.3);
+  outline-offset: 2px;
 }
 
 .validation-message {
@@ -126,6 +138,11 @@ h1 {
   overflow-wrap: anywhere;
 }
 
+.task-title {
+  display: inline-block;
+  cursor: pointer;
+}
+
 .completed {
   color: var(--muted);
   text-decoration: line-through;
@@ -140,6 +157,11 @@ h1 {
   background: #fee2e2;
   color: #991b1b;
   padding: 0.45rem 0.65rem;
+}
+
+.clear-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .empty-state {

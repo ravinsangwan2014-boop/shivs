@@ -17,6 +17,8 @@
           type="text"
           placeholder="Add a new task"
           autocomplete="off"
+          aria-describedby="validation-message"
+          aria-invalid="false"
           required
           maxlength="200"
         />
@@ -24,14 +26,15 @@
       </form>
 
       <p id="validation-message" class="validation-message" role="alert" aria-live="assertive"></p>
+      <p id="status-message" class="sr-only" role="status" aria-live="polite"></p>
 
       <section class="toolbar" aria-label="Task filters">
         <div class="filters" role="group" aria-label="Filter tasks">
-          <button type="button" class="filter-btn active" data-filter="all">All</button>
-          <button type="button" class="filter-btn" data-filter="active">Active</button>
-          <button type="button" class="filter-btn" data-filter="completed">Completed</button>
+          <button type="button" class="filter-btn active" data-filter="all" aria-pressed="true" aria-controls="task-list">All</button>
+          <button type="button" class="filter-btn" data-filter="active" aria-pressed="false" aria-controls="task-list">Active</button>
+          <button type="button" class="filter-btn" data-filter="completed" aria-pressed="false" aria-controls="task-list">Completed</button>
         </div>
-        <button type="button" id="clear-completed" class="clear-btn">Clear Completed</button>
+        <button type="button" id="clear-completed" class="clear-btn" aria-controls="task-list">Clear Completed</button>
       </section>
 
       <ul id="task-list" class="task-list" aria-label="Tasks"></ul>
