@@ -490,7 +490,12 @@
   global.TodoApp = api;
 
   if (global.document) {
-    const bootstrap = () => createApp().init();
+    const bootstrapFlag = '__TODO_APP_BOOTSTRAPPED__';
+    const bootstrap = () => {
+      if (global[bootstrapFlag]) return;
+      global[bootstrapFlag] = true;
+      createApp().init();
+    };
 
     if (
       global.document.readyState === 'loading' &&
