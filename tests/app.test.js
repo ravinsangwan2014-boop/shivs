@@ -240,6 +240,7 @@ test('loadTasks skips malformed data and normalizes task text safely', () => {
   assert.equal(app.state.tasks[0].text, 'valid task');
   assert.equal(app.state.tasks[1].text.length, MAX_TASK_LENGTH);
   assert.equal(app.state.tasks[1].createdAt, '');
+  assert.equal(storage.getItem(STORAGE_KEY), JSON.stringify(app.state.tasks));
 
   const secondItem = fixture.taskList.children[1];
   const label = secondItem.children[1].children[0];
@@ -247,6 +248,20 @@ test('loadTasks skips malformed data and normalizes task text safely', () => {
 
   assert.equal(label.textContent, app.state.tasks[1].text);
   assert.equal(deleteButton.getAttribute('aria-label'), `Delete task: ${app.state.tasks[1].text}`);
+});
+
+test('unreadable saved JSON is cleared so the app can recover on the next load', () => {
+  const fixture = createFixture();
+  const storage = createMemoryStorage('{bad json');
+  const app = createApp({ document: fixture.document, storage });
+
+  assert.equal(app.init(), true);
+  assert.equal(app.state.tasks.length, 0);
+  assert.equal(storage.getItem(STORAGE_KEY), null);
+  assert.equal(
+    fixture.validationMessage.textContent,
+    'Saved tasks were reset because stored data could not be read.'
+  );
 });
 
 test('setFilter updates visible tasks and pressed state for filter buttons', () => {
@@ -267,6 +282,19 @@ test('setFilter updates visible tasks and pressed state for filter buttons', () 
   assert.equal(fixture.filterButtons[1].getAttribute('aria-pressed'), 'false');
   assert.equal(fixture.filterButtons[2].getAttribute('aria-pressed'), 'true');
   assert.equal(fixture.statusMessage.textContent, 'Showing completed tasks.');
+});
+
+test('init is idempotent for a single app instance and does not rebind listeners', () => {
+  const fixture = createFixture();
+  const app = createApp({ document: fixture.document, storage: createMemoryStorage() });
+
+  assert.equal(app.init(), true);
+  assert.equal(app.init(), true);
+  assert.equal(fixture.form.listeners.submit.length, 1);
+  assert.equal(fixture.clearCompleted.listeners.click.length, 1);
+  assert.equal(fixture.filterButtons[0].listeners.click.length, 1);
+  assert.equal(fixture.filterButtons[1].listeners.click.length, 1);
+  assert.equal(fixture.filterButtons[2].listeners.click.length, 1);
 });
 
 test('failed saves revert state and keep the rendered UI consistent', () => {

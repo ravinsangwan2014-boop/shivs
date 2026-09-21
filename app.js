@@ -109,6 +109,7 @@
       tasks: [],
       filter: 'all',
     };
+    let eventsBound = false;
 
     let elements = readElements();
 
@@ -186,6 +187,19 @@
     }
 
     function loadTasks() {
+      function persistRecoveredTasks(tasks) {
+        try {
+          if (!tasks.length && typeof storageRef.storage.removeItem === 'function') {
+            storageRef.storage.removeItem(STORAGE_KEY);
+            return;
+          }
+
+          storageRef.storage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+        } catch {
+          // Ignore recovery write failures and continue with in-memory recovery.
+        }
+      }
+
       try {
         const raw = storageRef.storage.getItem(STORAGE_KEY);
         if (!raw) return [];
@@ -193,17 +207,20 @@
         const parsed = JSON.parse(raw);
         if (!Array.isArray(parsed)) {
           showValidation('Saved tasks were reset because stored data was invalid.');
+          persistRecoveredTasks([]);
           return [];
         }
 
         const sanitizedTasks = parsed.map(sanitizeTask).filter(Boolean);
         if (sanitizedTasks.length !== parsed.length) {
           showValidation('Some saved tasks were skipped because stored data was invalid.');
+          persistRecoveredTasks(sanitizedTasks);
         }
 
         return sanitizedTasks;
       } catch {
         showValidation('Saved tasks were reset because stored data could not be read.');
+        persistRecoveredTasks([]);
         return [];
       }
     }
@@ -419,12 +436,14 @@
 
     function bindEvents() {
       if (!hasRequiredElements()) return false;
+      if (eventsBound) return true;
 
       elements.form.addEventListener('submit', addTask);
       elements.filterButtons.forEach((button) => {
         button.addEventListener('click', () => setFilter(button.dataset.filter));
       });
       elements.clearCompleted.addEventListener('click', clearCompletedTasks);
+      eventsBound = true;
       return true;
     }
 
