@@ -313,3 +313,29 @@ test('storage fallback keeps the app usable when browser storage is unavailable'
     'Browser storage is unavailable. Tasks will work for this session only.'
   );
 });
+
+test('explicitly unavailable injected storage keeps the session-only warning visible', () => {
+  const fixture = createFixture();
+  const storage = createMemoryStorage();
+  const app = createApp({
+    document: fixture.document,
+    storage,
+    storageAvailable: false,
+    storagePersistent: false,
+  });
+
+  assert.equal(app.init(), true);
+  assert.equal(app.isPersistentStorage(), false);
+  assert.equal(
+    fixture.validationMessage.textContent,
+    'Browser storage is unavailable. Tasks will work for this session only.'
+  );
+
+  fixture.input.value = 'Injected storage task';
+
+  assert.equal(app.addTask({ preventDefault() {} }), true);
+  assert.equal(
+    fixture.validationMessage.textContent,
+    'Browser storage is unavailable. Tasks will work for this session only.'
+  );
+});

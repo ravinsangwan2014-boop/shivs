@@ -332,7 +332,7 @@
       }
 
       renderTasks();
-      if (!storageRef.available && !options.storage) {
+      if (!storageRef.available) {
         showStorageFallbackMessage();
       } else {
         clearValidation();
@@ -444,7 +444,7 @@
       bindEvents();
       renderTasks();
 
-      if (!storageRef.available && !options.storage) {
+      if (!storageRef.available) {
         showStorageFallbackMessage();
       }
 
