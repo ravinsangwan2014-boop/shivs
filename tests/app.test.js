@@ -205,10 +205,21 @@ function createFixture() {
   };
 }
 
-test('init safely returns false when required DOM is missing', () => {
-  const app = createApp();
+test('init safely returns false when required DOM is missing without reading storage', () => {
+  let storageRead = false;
+  const storage = {
+    getItem() {
+      storageRead = true;
+      return 'not-json';
+    },
+    setItem() {},
+    removeItem() {},
+  };
+
+  const app = createApp({ document: new FakeDocument(), storage });
 
   assert.equal(app.init(), false);
+  assert.equal(storageRead, false);
 });
 
 test('loadTasks skips malformed data and normalizes task text safely', () => {
@@ -275,6 +286,7 @@ test('failed saves revert state and keep the rendered UI consistent', () => {
   fixture.input.value = 'Buy milk';
 
   assert.equal(app.addTask({ preventDefault() {} }), false);
+  assert.equal(app.isPersistentStorage(), false);
   assert.equal(app.state.tasks.length, 0);
   assert.equal(fixture.taskList.children.length, 0);
   assert.equal(fixture.validationMessage.textContent, 'Tasks could not be saved. Your last change was not applied.');

@@ -74,8 +74,7 @@ h1 {
 }
 
 button:focus-visible,
-input:focus-visible,
-label:focus-visible {
+input:focus-visible {
   outline: 3px solid rgba(37, 99, 235, 0.3);
   outline-offset: 2px;
 }
@@ -141,6 +140,12 @@ label:focus-visible {
 .task-title {
   display: inline-block;
   cursor: pointer;
+}
+
+.task-item input[type='checkbox']:focus-visible + .task-text .task-title {
+  outline: 3px solid rgba(37, 99, 235, 0.3);
+  outline-offset: 3px;
+  border-radius: 6px;
 }
 
 .completed {

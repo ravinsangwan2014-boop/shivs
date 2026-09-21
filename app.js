@@ -20,9 +20,33 @@
     };
   }
 
-  function resolveStorage(providedStorage) {
+  function resolveStorage(providedStorage, storageOptions = {}) {
     if (providedStorage) {
-      return { storage: providedStorage, persistent: true, available: true };
+      if (
+        typeof storageOptions.persistent === 'boolean' ||
+        typeof storageOptions.available === 'boolean'
+      ) {
+        return {
+          storage: providedStorage,
+          persistent:
+            typeof storageOptions.persistent === 'boolean'
+              ? storageOptions.persistent
+              : Boolean(storageOptions.available),
+          available:
+            typeof storageOptions.available === 'boolean'
+              ? storageOptions.available
+              : Boolean(storageOptions.persistent),
+        };
+      }
+
+      try {
+        const probeKey = `${STORAGE_KEY}-probe`;
+        providedStorage.setItem(probeKey, '1');
+        providedStorage.removeItem(probeKey);
+        return { storage: providedStorage, persistent: true, available: true };
+      } catch {
+        return { storage: providedStorage, persistent: false, available: false };
+      }
     }
 
     try {
@@ -77,7 +101,10 @@
 
   function createApp(options = {}) {
     const documentRef = options.document || global.document || null;
-    const storageRef = resolveStorage(options.storage);
+    const storageRef = resolveStorage(options.storage, {
+      persistent: options.storagePersistent,
+      available: options.storageAvailable,
+    });
     const state = {
       tasks: [],
       filter: 'all',
@@ -403,7 +430,6 @@
 
     function init() {
       elements = readElements();
-      state.tasks = loadTasks();
 
       if (!documentRef) return false;
 
@@ -414,6 +440,7 @@
         return false;
       }
 
+      state.tasks = loadTasks();
       bindEvents();
       renderTasks();
 
